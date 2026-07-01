@@ -1,8 +1,9 @@
-# Unit 3 Phase III — Build: Prior Contribution Report
+# Open Source Contribution Report
 
 > **⚠️ Timeline disclosure:** This work was completed **2026-04-01 through 2026-04-25**, prior to
-> my transfer into the current course unit. It is reported here for Phase III Build documentation
-> purposes. All dates, commit hashes, and PR links are verifiable from the repository.
+> my transfer into the current course unit. It is reported here for Phase III Build and Phase IV
+> Submit & Iterate documentation purposes. All dates, commit hashes, and PR links are verifiable
+> from the repository.
 
 ---
 
@@ -13,6 +14,8 @@
 **My fork:** [rattnak/studio-json-schema](https://github.com/rattnak/studio-json-schema)
 
 ---
+
+# Phase III — Build
 
 ## Implementation Notes
 
@@ -178,6 +181,64 @@ Issue #260 was filed by me before the PR, which required writing a full problem 
 proposed solution, screenshots, and alternatives considered to establish legitimacy of the feature
 request. This was a direct lesson learned from the PR #157 experience where a PR was opened without
 an assigned issue.
+
+---
+
+# Phase IV — Submit & Iterate
+
+## PR Link
+
+[https://github.com/ioflux-org/studio-json-schema/pull/263](https://github.com/ioflux-org/studio-json-schema/pull/263) — `feat: mobile editor drawer layout improvements`
+
+## PR Summary
+
+Implemented a responsive mobile drawer layout for the JSON Schema Studio editor: on screens
+narrower than 768px, the horizontal Monaco-editor/graph-view split is replaced with a vertical
+drawer where the graph takes full width and the editor slides up from the bottom. The PR also adds
+virtual-keyboard-aware resize clamping, a 48px accessible toggle button with proper ARIA
+attributes, and viewport fixes (`100dvh`, `viewport-fit=cover`) for mobile browser chrome and iOS
+safe areas. Closes issue [#260](https://github.com/ioflux-org/studio-json-schema/issues/260),
+which I filed myself before starting implementation.
+
+## Maintainer Feedback & How It Was Addressed
+
+| Date | Who | Feedback | Response |
+|------|-----|----------|----------|
+| 2026-04-02 | `coderabbitai` (inline) | Virtual-keyboard resize math could shrink the editor below the 40% floor on tall keyboards | Rewrote the clamp to `Math.max(40, Math.min(Math.round(visiblePercent * 0.55), 70))` in commit `f71145c` |
+| 2026-04-02 | `coderabbitai` (inline) | Full-width `z-10` overlay wrapper was blocking pointer events to the graph view | Scoped `pointer-events-auto` to just the button, `pointer-events-none` on the wrapper, in commit `867d153` |
+| 2026-04-02 | `coderabbitai` (nitpick) | Toggle button missing `aria-expanded` | Added `aria-expanded`/`aria-label` reflecting drawer state |
+| 2026-04-05 | Follow-up review | ARIA semantics missing on error toast | Fixed in commit `ce3ce19` |
+| 2026-04-02 | `AgniveshChaubey` (maintainer) | Concern about AI-generated feel / scope creep (later clarified to have been intended for a different PR, #245) | Acknowledged the concern, explained AI was used only for WCAG/UI-standards checking rather than code generation, and committed to smaller, more clearly scoped PRs going forward |
+| 2026-04-25 | `AgniveshChaubey` (maintainer) | Final review | **APPROVED**, merged same day |
+
+Full review cycle took 23 days (2026-04-02 → 2026-04-25), including two rebases against `main` to
+resolve merge conflicts while waiting on maintainer bandwidth.
+
+## Status
+
+**Merged ✅** — merged 2026-04-25 by maintainer `AgniveshChaubey`.
+
+---
+
+## Learnings & Reflections
+
+- **Filing the issue first paid off.** Writing up problem statement, proposed solution,
+  screenshots, and alternatives considered in [#260](https://github.com/ioflux-org/studio-json-schema/issues/260)
+  before opening the PR gave the change legitimacy and made the eventual review conversation
+  about implementation details rather than "should this exist."
+- **Automated review (CodeRabbit) catches real bugs, not just style nits.** Both the keyboard-resize
+  math bug and the pointer-events overlay bug were genuine functional defects caught before a human
+  reviewer even looked — worth treating bot feedback with the same seriousness as maintainer
+  comments.
+- **Scope discipline matters more than I expected.** Even though the AI-generated-feel comment
+  turned out to be misattributed to this PR, it was a useful forcing function to keep future PRs
+  narrowly scoped to one issue and to proactively flag any drift instead of bundling improvements.
+- **Review latency is normal and not a signal of rejection.** 23 days from open to merge, with a
+  quiet stretch waiting on maintainer availability, was resolved with a single polite follow-up
+  comment rather than repeated pinging.
+- **What I'd do differently:** communicate the AI-assistance boundary (used for accessibility
+  standards lookup, not code generation) proactively in the PR description itself, rather than only
+  after a maintainer raised concern about it.
 
 ---
 
