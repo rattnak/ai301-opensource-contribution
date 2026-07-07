@@ -1,9 +1,21 @@
 # Open Source Contribution Report
 
-> **⚠️ Timeline disclosure:** This work was completed **2026-04-01 through 2026-04-25**, prior to
-> my transfer into the current course unit. It is reported here for Phase III Build and Phase IV
-> Submit & Iterate documentation purposes. All dates, commit hashes, and PR links are verifiable
-> from the repository.
+## Current Status — Phase I, Round 2 (In Progress)
+
+**Repository:** [internetarchive/openlibrary](https://github.com/internetarchive/openlibrary)
+**Issue:** [#7988](https://github.com/internetarchive/openlibrary/issues/7988)
+**Status:** 🟡 In discussion with maintainers on Slack to scope the approach before starting implementation.
+
+I'm currently in the scoping stage for this issue — discussing implementation approach with a
+maintainer on the OpenLibrary Slack before writing any code, to avoid the scope-creep feedback
+encountered in the prior contribution below.
+
+---
+
+> **⚠️ Timeline disclosure:** The report below covers work completed **2026-04-01 through
+> 2026-04-25**, prior to my transfer into the current course unit. It is reported here for
+> Phase III Build and Phase IV Submit & Iterate documentation purposes. All dates, commit hashes,
+> and PR links are verifiable from the repository.
 
 ---
 
