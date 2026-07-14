@@ -8,45 +8,24 @@ This report tracks two contributions. Contribution 2 (Open Library) is in progre
 
 **Contribution Number:** 2
 **Student:** Rattnak
-**Issue:** See [Chosen Issue](#chosen-issue) below — sourced from a maintainer Slack conversation rather than the course issue list; not yet filed/linked as a standalone GitHub issue.
+**Issue:** No specific GitHub issue yet — see note below. Related issues: [#8462](https://github.com/internetarchive/openlibrary/issues/8462), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
 **Status:** Phase I — In Progress
 
 ---
 
-## Phase I Checklist
+## Note on Issue Status
 
-- [x] 1. Logged into GitHub and Slack
-- [x] 2. Created public Contribution README from the provided template
-- [ ] 3. Find one live GitHub issue from the course list — **outstanding, see note below**
-- [x] 4. Update README with issue link + "Why I Chose This Issue" summary — *partially complete; issue link pending item 3*
-- [ ] 5. Comment on the chosen issue + mark the row in the course Google Sheet — **blocked on item 3**
-- [ ] 6. Fork the chosen project — **blocked on item 3**
-- [ ] 7. Submit check-in form marking Phase I complete — **blocked on items 3, 5, 6**
+There is no single specific GitHub issue assigned to this contribution yet. A maintainer informed me directly (see screenshot below) to research the Trusted Book Providers (TBP) import process and come back with a concrete recommendation. My research is related to — but not a 1:1 match for — the existing issues above (#8462, #10856, #12091, #8542), which I'm using as background and prior art while I work.
 
-**Note on item 3:** My actual assigned work came directly out of a Slack conversation with an Open Library maintainer, rather than from picking an issue off the course-provided list. That conversation pointed me toward the Trusted Book Providers (TBP) import process and specifically referenced the existing GitHub issues below as context/prior art. I still need to either get the maintainer to file a dedicated issue for the scoped work, or get explicit sign-off to treat one of these referenced issues as my "chosen issue" for course tracking purposes, before I can complete steps 3, 5, 6, and 7.
+Once my research and recommendation are complete, the maintainer and I will open a new, dedicated GitHub issue that reflects the actual scoped work, and I'll update this section with that link.
 
----
-
-## Chosen Issue
-
-**Source:** Slack conversation with an Open Library maintainer (not from the course issue list).
-
-**Screenshot of thread:** *[placeholder — insert screenshot of the Slack thread here]*
-
-The maintainer directed me toward the Trusted Book Providers import pipeline and pointed to the following live GitHub issues as the relevant context for the work:
-
-- [#8462 — Video Tutorial of Implementing a Trusted Book Provider](https://github.com/internetarchive/openlibrary/issues/8462) (general tracking issue)
-- [#10856 — Import bookdash.org as a Trusted Book Provider](https://github.com/internetarchive/openlibrary/issues/10856)
-- [#12091 — Inquiry: Importing ITAN Global Publishing Catalog to Open Library](https://github.com/internetarchive/openlibrary/issues/12091)
-- [#8542 — Create documentation for doing batch imports in the developer environment](https://github.com/internetarchive/openlibrary/issues/8542)
-
-My actual scoped task — as discussed in the Slack thread — does not map one-to-one onto any single one of these; it will be tracked/referenced through them until a dedicated issue exists.
+**Screenshot of maintainer conversation:** *[placeholder — insert screenshot of the chat where the maintainer asked me to work on this]*
 
 ---
 
 ## Why I Chose This Issue
 
-I wanted a contribution that involved understanding an existing data pipeline end-to-end rather than a single isolated UI fix, and Open Library's Trusted Book Providers (TBP) program fit that well — it touches data modeling, external partner integration, and a real backlog of stalled community requests that a clearer process could unblock. The maintainer's Slack ask is effectively a documentation/tooling gap (mirrored in the public issues above): future partners shouldn't each need hours of one-on-one maintainer hand-holding to onboard. It also follows the scope-creep lesson from my prior ioflux contribution — I'm confirming scope directly with a maintainer before writing any code.
+I wanted a contribution that involved understanding an existing data pipeline end-to-end rather than a single isolated UI fix, and Open Library's Trusted Book Providers (TBP) program fit that well — it touches data modeling, external partner integration, and a real backlog of stalled community requests that a clearer process could unblock. This specific direction came from a maintainer who asked me to research the TBP import process directly, rather than from picking an issue off a list, which also means the eventual dedicated issue will already have maintainer buy-in. It follows the scope-creep lesson from my prior ioflux contribution — I'm confirming scope directly with a maintainer through research before writing any code.
 
 ---
 
