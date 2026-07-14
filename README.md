@@ -7,7 +7,7 @@ This report tracks two contributions. Contribution 2 (Open Library) is in progre
 # Contribution 2: Trusted Book Providers Import Process (Open Library)
 
 **Contribution Number:** 2
-**Student:** Rattnak
+**Student:** Chanrattnak Mong
 **Issue:** No specific GitHub issue yet — see note below. Related issues: [#8462](https://github.com/internetarchive/openlibrary/issues/8462), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
 **Status:** Phase I — In Progress
 
@@ -26,6 +26,145 @@ Once my research and recommendation are complete, the maintainer and I will open
 ## Why I Chose This Issue
 
 I wanted a contribution that involved understanding an existing data pipeline end-to-end rather than a single isolated UI fix, and Open Library's Trusted Book Providers (TBP) program fit that well — it touches data modeling, external partner integration, and a real backlog of stalled community requests that a clearer process could unblock. This specific direction came from a maintainer who asked me to research the TBP import process directly, rather than from picking an issue off a list, which also means the eventual dedicated issue will already have maintainer buy-in. It follows the scope-creep lesson from my prior ioflux contribution — I'm confirming scope directly with a maintainer through research before writing any code.
+
+---
+
+## Understanding the Issue
+
+### Problem Description
+
+Onboarding a new "trusted" external book data source (e.g. a publisher's catalog) into Open Library currently requires a maintainer to manually walk each contributor through writing a custom Python script, extending TBP registration code, and submitting records via `openlibrary-client` — a process that isn't well documented outside git history and ad hoc conversations. The related issues (#8462, #8542) point at this same documentation/tooling gap; the maintainer asked me to research it directly.
+
+### Expected Behavior
+
+A new trusted provider should be onboardable by following documented steps and a reference adapter implementation, with a maintainer needed only for final identifier registration and batch approval — not for explaining the pipeline from scratch each time.
+
+### Current Behavior
+
+Each new source is a bespoke, mostly undocumented effort. Two related public issues show this breaking down in different ways: ITAN (#12091) is blocked on an identifier-registration PR that hasn't merged/deployed; BookDash (#10856) got further (working scraper, one real batch submitted) but hit undocumented gotchas — author-name/role duplication risk, silently dropped cover images, no way to delete a bad batch.
+
+### Affected Components
+
+- `openlibrary/plugins/importapi/` — HTTP import endpoints (`/api/import`, `/api/import/ia`)
+- `openlibrary/core/batch_imports.py` and `openlibrary/core/imports.py` — batch JSONL ingestion and the `Batch` queue model
+- `openlibrary/catalog/add_book/__init__.py` — final record creation, dedup matching, and the hardcoded `ALLOWED_COVER_HOSTS` allowlist
+- `openlibrary/plugins/openlibrary/config/edition/identifiers.yml` — identifier type registration
+- `openlibrary-client` (separate repo) — `olclient/imports.py`, `import.schema.json`
+- `openlibrary-bots` (separate repo) — `sources/<slug>/` concrete source adapters
+
+---
+
+## Reproduction Process
+
+### Environment Setup
+
+Not started — no local development environment set up yet. Per program guidelines, environment setup and fork cloning happen in Phase II, once a dedicated issue exists.
+
+### Steps to Reproduce
+
+Not applicable yet — this is a process/documentation gap, not a reproducible bug. Phase II will involve tracing the pipeline hands-on (likely via the documented local setup in `docs/ai/imports/debugging.md`) once scope is confirmed with the maintainer.
+
+### Reproduction Evidence
+
+- **Commit showing reproduction:** N/A — Phase I, no code yet
+- **Screenshots/logs:** N/A
+- **My findings:** N/A — reserved for Phase II
+
+---
+
+## Solution Approach
+
+### Analysis
+
+[Not yet started — Phase II/III, pending a dedicated issue and maintainer scope confirmation]
+
+### Proposed Solution
+
+[Not yet started — Phase II/III]
+
+### Implementation Plan
+
+Using UMPIRE framework (adapted):
+
+**Understand:** [Not yet started — Phase II]
+
+**Match:** [Not yet started — Phase II]
+
+**Plan:** [Not yet started — Phase II]
+
+**Implement:** [Not yet started — Phase III]
+
+**Review:** [Not yet started — Phase III]
+
+**Evaluate:** [Not yet started — Phase III]
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+
+- [ ] [Not yet started — Phase III]
+
+### Integration Tests
+
+- [ ] [Not yet started — Phase III]
+
+### Manual Testing
+
+[Not yet started — Phase III]
+
+---
+
+## Implementation Notes
+
+### Week 1 Progress (2026-07-14)
+
+Spent this week on research only, no code written. Read the four related GitHub issues (#8462, #10856, #12091, #8542) in full, including comment threads, per a maintainer's direct request to investigate the TBP import process. Compared the ITAN and BookDash cases as reference points for what a streamlined process needs to solve. Next step: bring a concrete recommendation back to the maintainer, at which point a dedicated GitHub issue will be opened for this contribution.
+
+### Code Changes
+
+- **Files modified:** None yet
+- **Key commits:** None yet
+- **Approach decisions:** None yet — pending maintainer scope confirmation
+
+---
+
+## Pull Request
+
+**PR Link:** Not yet opened
+
+**PR Description:** [Not yet started]
+
+**Maintainer Feedback:**
+- 2026-07-14: Maintainer asked me directly (via chat) to research the TBP import process and come back with a recommendation, rather than assigning a specific existing issue.
+
+**Status:** Awaiting research completion / dedicated issue
+
+---
+
+## Learnings & Reflections
+
+### Technical Skills Gained
+
+Early-stage: learned the shape of a real production import/ETL pipeline from documentation and issue threads — schema validation, deduplication by identifier, a human-in-the-loop batch review queue, and a few silent-failure modes (identifier drop, cover-host drop) worth designing around later.
+
+### Challenges Overcome
+
+Working without a formally assigned issue required extra care to keep the "Why I Chose This Issue" and issue-tracking sections honest about what's confirmed vs. still pending, rather than presenting related issues as if they were the actual assignment.
+
+### What I'd Do Differently Next Time
+
+Ask for a dedicated issue to be filed at the start of the conversation, rather than after research is complete, so tracking stays unambiguous from day one.
+
+---
+
+## Resources Used
+
+- [docs/ai/imports/](https://github.com/internetarchive/openlibrary/tree/master/docs/ai/imports) (internal Open Library documentation)
+- [Issue #8462](https://github.com/internetarchive/openlibrary/issues/8462), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
+- [BookDash scraper gist](https://gist.github.com/sai-krishna-kotha/2602c9d13b0f3da4c4a0e701096b0219)
+- [openlibrary-client import schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/import.schema.json)
 
 ---
 
