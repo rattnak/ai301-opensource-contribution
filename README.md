@@ -4,188 +4,49 @@ This report tracks two contributions. Contribution 2 (Open Library) is in progre
 
 ---
 
-# Contribution 2: Streamlining the Trusted Book Providers Import Process
+# Contribution 2: Trusted Book Providers Import Process (Open Library)
 
 **Contribution Number:** 2
 **Student:** Rattnak
-**Issue:** [#8462 — Video Tutorial of Implementing a Trusted Book Provider](https://github.com/internetarchive/openlibrary/issues/8462)
+**Issue:** See [Chosen Issue](#chosen-issue) below — sourced from a maintainer Slack conversation rather than the course issue list; not yet filed/linked as a standalone GitHub issue.
 **Status:** Phase I — In Progress
+
+---
+
+## Phase I Checklist
+
+- [x] 1. Logged into GitHub and Slack
+- [x] 2. Created public Contribution README from the provided template
+- [ ] 3. Find one live GitHub issue from the course list — **outstanding, see note below**
+- [x] 4. Update README with issue link + "Why I Chose This Issue" summary — *partially complete; issue link pending item 3*
+- [ ] 5. Comment on the chosen issue + mark the row in the course Google Sheet — **blocked on item 3**
+- [ ] 6. Fork the chosen project — **blocked on item 3**
+- [ ] 7. Submit check-in form marking Phase I complete — **blocked on items 3, 5, 6**
+
+**Note on item 3:** My actual assigned work came directly out of a Slack conversation with an Open Library maintainer, rather than from picking an issue off the course-provided list. That conversation pointed me toward the Trusted Book Providers (TBP) import process and specifically referenced the existing GitHub issues below as context/prior art. I still need to either get the maintainer to file a dedicated issue for the scoped work, or get explicit sign-off to treat one of these referenced issues as my "chosen issue" for course tracking purposes, before I can complete steps 3, 5, 6, and 7.
+
+---
+
+## Chosen Issue
+
+**Source:** Slack conversation with an Open Library maintainer (not from the course issue list).
+
+**Screenshot of thread:** *[placeholder — insert screenshot of the Slack thread here]*
+
+The maintainer directed me toward the Trusted Book Providers import pipeline and pointed to the following live GitHub issues as the relevant context for the work:
+
+- [#8462 — Video Tutorial of Implementing a Trusted Book Provider](https://github.com/internetarchive/openlibrary/issues/8462) (general tracking issue)
+- [#10856 — Import bookdash.org as a Trusted Book Provider](https://github.com/internetarchive/openlibrary/issues/10856)
+- [#12091 — Inquiry: Importing ITAN Global Publishing Catalog to Open Library](https://github.com/internetarchive/openlibrary/issues/12091)
+- [#8542 — Create documentation for doing batch imports in the developer environment](https://github.com/internetarchive/openlibrary/issues/8542)
+
+My actual scoped task — as discussed in the Slack thread — does not map one-to-one onto any single one of these; it will be tracked/referenced through them until a dedicated issue exists.
 
 ---
 
 ## Why I Chose This Issue
 
-I wanted a contribution that involved understanding an existing data pipeline end-to-end rather than a single isolated UI fix, and Open Library's Trusted Book Providers (TBP) program fit that well — it touches data modeling, external partner integration, and a real backlog of stalled community requests (ITAN, BookDash) that a clearer process could unblock. Issue #8462 is explicitly a documentation/tooling gap: maintainer `mekarpeles` is asking for a worked example so future partners don't each need hours of maintainer hand-holding. That's a scope I can complete without needing deep pre-existing familiarity with Open Library's Infobase internals, while still learning a nontrivial ingestion pipeline (schema validation, dedup, batch queues, ImportBot).
-
-It also directly follows the scope-creep lesson from my prior ioflux contribution: rather than jumping into code, I'm spending Phase I fully understanding the pipeline and proposing a plan to a maintainer before writing anything, to keep the eventual PR narrowly scoped.
-
----
-
-## Understanding the Issue
-
-### Problem Description
-
-Onboarding a new "trusted" external book data source (e.g. a publisher's catalog) into Open Library currently requires a maintainer to manually walk each contributor through writing a custom Python script, extending TBP registration code, and submitting records via `openlibrary-client` — a process that is undocumented outside of git commit history and Slack conversations. Issue #8462 asks for a video/worked example; the related issue #8542 flags the same doc gap for batch imports specifically.
-
-### Expected Behavior
-
-A new trusted provider (with a catalog in a reasonably clean format) should be onboardable by a contributor following documented steps and a reference adapter implementation, with a maintainer only needed for final identifier-registration and batch approval — not for explaining the pipeline from scratch each time.
-
-### Current Behavior
-
-Each new source is a bespoke, mostly undocumented effort. Two live examples show the pattern breaking down in different ways:
-- **ITAN** ([#12091](https://github.com/internetarchive/openlibrary/issues/12091)): a publisher waited 2+ weeks for a response after submitting their catalog; the request is now blocked on an identifier-registration PR that hasn't merged/deployed.
-- **BookDash** ([#10856](https://github.com/internetarchive/openlibrary/issues/10856)): a contributor got much further (working scraper, one real batch submitted) but hit undocumented gotchas — author-name/role duplication risk, silently dropped cover images, no way to delete a bad batch — that a documented pipeline would have surfaced earlier.
-
-### Affected Components
-
-- `openlibrary/plugins/importapi/` — HTTP import endpoints (`/api/import`, `/api/import/ia`)
-- `openlibrary/core/batch_imports.py` and `openlibrary/core/imports.py` — batch JSONL ingestion and the `Batch` queue model
-- `openlibrary/catalog/add_book/__init__.py` — final record creation, dedup matching, and the hardcoded `ALLOWED_COVER_HOSTS` allowlist
-- `openlibrary/plugins/openlibrary/config/edition/identifiers.yml` — identifier type registration
-- `openlibrary-client` (separate repo) — `olclient/imports.py` (`DataProvider`, `OLImportRecord`) and `import.schema.json`
-- `openlibrary-bots` (separate repo) — `sources/<slug>/` concrete source adapters (e.g. the in-progress ITAN adapter)
-- `docs/ai/imports/` — existing internal documentation of the pipeline, which I'm treating as the current source of truth
-
----
-
-## Reproduction Process
-
-### Environment Setup
-
-Not yet applicable — Phase I has been research against the live GitHub repo and issue threads rather than a local dev environment. The repo's `docs/ai/imports/debugging.md` documents a local setup path (`compose.near-prod.yaml` with an `importbot` service, `LOCAL_DEV=true` seeded dev login) that I plan to use once implementation starts, to run a full submit → queue → ImportBot cycle locally before proposing changes against the real batch queue.
-
-### Steps to Reproduce
-
-This issue isn't a bug with a repro path — it's a process gap. The "reproduction" was tracing the two blocked real-world cases through the pipeline:
-
-1. Read issue #8462 (tracking issue) and #8542 (docs gap) to confirm the maintainer's ask.
-2. Read #12091 (ITAN) end-to-end — found the identifier-registration blocker.
-3. Read #10856 (BookDash) end-to-end — found the batch already exists (`openlibrary.org/import/batch/1516`) with specific, named defects still open.
-4. Cross-referenced both against `openlibrary/plugins/importapi/` source and `docs/ai/imports/` to see exactly where each case stalls in the pipeline.
-
-### Reproduction Evidence
-
-- **Commit showing reproduction:** N/A (research phase, no code changes yet)
-- **Screenshots/logs:** N/A
-- **My findings:** See "Understanding the Issue" and "Analysis" — the pipeline works, but has three specific undocumented failure points (identifier-registration timing, cover-host allowlist, author-name parsing) that stall real contributors without maintainer intervention.
-
----
-
-## Solution Approach
-
-### Analysis
-
-The pipeline itself (`DataProvider` → `OLImportRecord` → `/import/batch/new` → `Batch` queue → ImportBot → `add_book.load()`) is functional and already used in production. The root cause of onboarding friction isn't the pipeline's design — it's that its constraints are undocumented and only discoverable by hitting them:
-1. Identifier types must be registered in `identifiers.yml` and **deployed** before a batch references them, or the field is silently dropped (no error).
-2. Cover URLs are silently set to `None` if the host isn't in a hardcoded allowlist in `add_book/__init__.py` — again, no error.
-3. There's no batch-delete capability, so a data-quality mistake (like BookDash's author-role-in-name bug) can't be cleanly retried.
-
-These are exactly the kind of gotchas a documented, worked example would surface up front instead of via a multi-week back-and-forth with a maintainer.
-
-### Proposed Solution
-
-Use BookDash as the concrete worked example, since it's furthest along and already has maintainer engagement:
-1. Fix the two known BookDash defects (author-role stripping in the scraper/adapter output, and either expanding the cover-host allowlist or re-hosting BookDash cover images) as a first, narrowly-scoped PR.
-2. Formalize the BookDash scraper into the standard `openlibrary-bots/sources/<slug>/` adapter pattern (`DataProviderRecord` + `JSONLProvider`), rather than leaving it as a one-off script.
-3. Write up the end-to-end steps as the documentation #8462 and #8542 are asking for, using BookDash as the reference case.
-
-This also unblocks ITAN indirectly: once the identifier-registration-before-deploy constraint and adapter pattern are clearly documented, ITAN's remaining blocker (PR #12947 merging/deploying) becomes a simple sequencing step rather than a source of repeated confusion.
-
-### Implementation Plan
-
-Using UMPIRE framework (adapted):
-
-**Understand:** New trusted-provider onboarding is undocumented and maintainer-bottlenecked; two real requests (ITAN, BookDash) are stalled for different, both-documentable reasons.
-
-**Match:** The existing `docs/ai/imports/` directory already documents architecture, API endpoints, and known limitations in detail — my job is to extend/validate this against a real end-to-end case (BookDash) rather than invent new documentation structure from scratch. The `openlibrary-bots/sources/itan/` adapter (in progress, PR #447) is a template for what a completed BookDash adapter should look like.
-
-**Plan:**
-1. Confirm with maintainer (`mekarpeles`/`cdrini`) that BookDash is an acceptable pilot case before starting (avoids the scope-creep issue from Contribution 1).
-2. Fix author-role parsing in the BookDash scraper output so authors aren't duplicated on import.
-3. Resolve the cover-image gap — propose either an `ALLOWED_COVER_HOSTS` PR for `bookdash.org` or a re-hosting step.
-4. Package the scraper as a proper `DataProviderRecord`/`JSONLProvider` adapter under `openlibrary-bots/sources/bookdash/`.
-5. Validate with `?preview=true` dry-runs before any real batch resubmission.
-6. Write/extend documentation in `docs/ai/imports/adding-sources.md` using BookDash as the worked example.
-
-**Implement:** Not started — pending maintainer sign-off on scope (see Status below).
-
-**Review:** Self-review checklist once implemented: PR touches only the scoped files (scraper fix, adapter, docs); no unrelated refactors; `source_records` prefix stable; dry-run output included in PR description per the project's own PR review expectations (`docs/ai/imports/adding-sources.md`).
-
-**Evaluate:** Local dry-run via `?preview=true`, plus local ImportBot run via `compose.near-prod.yaml` before proposing any real batch changes.
-
----
-
-## Testing Strategy
-
-### Unit Tests
-
-- [ ] Test case 1: Author name parsing strips role suffixes (e.g. `"Name (Illustrator)"` → `"Name"`) without over-stripping legitimate parenthetical name content
-- [ ] Test case 2: Cover URL host-check behavior against the (possibly expanded) `ALLOWED_COVER_HOSTS` list
-- [ ] Test case 3: Adapter's `to_ol_import()` correctly returns `None` for malformed source records instead of raising
-
-### Integration Tests
-
-- [ ] Integration scenario 1: End-to-end `?preview=true` dry-run of a BookDash record through the adapter → `OLImportRecord` → validator
-- [ ] Integration scenario 2: Local ImportBot queue processing of a small resubmitted BookDash batch (via `compose.near-prod.yaml`)
-
-### Manual Testing
-
-Not yet started — planned once implementation begins, using the local dev pipeline documented in `docs/ai/imports/debugging.md`.
-
----
-
-## Implementation Notes
-
-### Week 1 Progress (2026-07-14)
-
-Spent this week entirely on research, no code written yet. Read issues #8462, #12091, #10856, and #8542 in full, including comment threads. Found that the repo already has substantial internal documentation at `docs/ai/imports/` (index, API reference, adding-sources guide, debugging/known-limitations doc) that closely maps to what #8462/#8542 are asking for — meaning this contribution is more "close the gap and validate against a real case" than "write from a blank page." Compared ITAN vs. BookDash as pilot candidates and concluded BookDash is the better first case (further along, maintainer already engaged, concrete named defects rather than open design questions). Next step is proposing this plan to a maintainer on Slack before touching code.
-
-### Code Changes
-
-- **Files modified:** None yet
-- **Key commits:** None yet
-- **Approach decisions:** Chose BookDash over ITAN as the pilot case (see Analysis); deferred any implementation until maintainer scope confirmation, per the lesson learned in Contribution 1
-
----
-
-## Pull Request
-
-**PR Link:** Not yet opened
-
-**PR Description:** Draft plan (pending maintainer confirmation): fix BookDash author-role and cover-host defects, formalize the BookDash scraper into the standard `openlibrary-bots` adapter pattern, and extend `docs/ai/imports/adding-sources.md` with BookDash as the worked example — addressing #8462 and #8542, and unblocking #10856.
-
-**Maintainer Feedback:**
-- Not yet solicited — next step is reaching out on the OpenLibrary Slack to confirm BookDash as an acceptable pilot before implementation.
-
-**Status:** Scoping — pre-PR
-
----
-
-## Learnings & Reflections
-
-### Technical Skills Gained
-
-Learned the shape of a real production import/ETL pipeline: schema validation with `extra="forbid"` Pydantic models, deduplication by identifier, a human-in-the-loop batch review queue, and the specific silent-failure modes (identifier drop, cover-host drop) that this kind of pipeline accumulates over time without always being one loud error.
-
-### Challenges Overcome
-
-The main challenge so far was disambiguating "what's already solved" from "what's actually the gap" — the repo's existing `docs/ai/imports/` documentation is thorough, so the real contribution isn't writing docs from scratch but finding and closing the specific remaining defects (author parsing, cover allowlist) that stand between "documented pipeline" and "a real partner successfully onboarded."
-
-### What I'd Do Differently Next Time
-
-Get maintainer confirmation on the pilot choice (BookDash vs. ITAN) earlier — ideally before doing the full deep-dive into both issue threads — so research time is spent entirely on the confirmed path rather than comparing two candidates in parallel.
-
----
-
-## Resources Used
-
-- [docs/ai/imports/index.md, api.md, adding-sources.md, debugging.md](https://github.com/internetarchive/openlibrary/tree/master/docs/ai/imports) (internal Open Library documentation)
-- [Issue #8462](https://github.com/internetarchive/openlibrary/issues/8462), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
-- [BookDash scraper gist](https://gist.github.com/sai-krishna-kotha/2602c9d13b0f3da4c4a0e701096b0219)
-- [openlibrary-client import schema](https://github.com/internetarchive/openlibrary-client/blob/master/olclient/schemata/import.schema.json)
-
----
+I wanted a contribution that involved understanding an existing data pipeline end-to-end rather than a single isolated UI fix, and Open Library's Trusted Book Providers (TBP) program fit that well — it touches data modeling, external partner integration, and a real backlog of stalled community requests that a clearer process could unblock. The maintainer's Slack ask is effectively a documentation/tooling gap (mirrored in the public issues above): future partners shouldn't each need hours of one-on-one maintainer hand-holding to onboard. It also follows the scope-creep lesson from my prior ioflux contribution — I'm confirming scope directly with a maintainer before writing any code.
 
 ---
 
