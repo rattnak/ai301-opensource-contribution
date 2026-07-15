@@ -6,9 +6,9 @@ This report tracks two contributions. Contribution 2 (Open Library) is in progre
 
 # Contribution 2: Trusted Book Providers Import Process (Open Library)
 
-**Contribution Number:** 2
-**Student:** Chanrattnak Mong
-**Issue:** No specific GitHub issue yet — see note below. Related issues: [#8462](https://github.com/internetarchive/openlibrary/issues/8462), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
+* **Contribution Number:** 2
+* **Student:** Chanrattnak Mong
+* **Issue:** No specific GitHub issue yet — see note below. Related issues: [#8462](https://github.com/internetarchive/openlibrary/issues/8462), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
 **Status:** Phase I — In Progress
 
 ---
