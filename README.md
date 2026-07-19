@@ -8,16 +8,22 @@ This report tracks two contributions. Contribution 2 (Open Library) is in progre
 
 * **Contribution Number:** 2
 * **Student:** Chanrattnak Mong
-* **Issue:** No specific GitHub issue yet — see note below. Related issues: [#8462](https://github.com/internetarchive/openlibrary/issues/8462), [#10856](https://github.com/internetarchive/openlibrary/issues/10856), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
-**Status:** Phase I — In Progress
+* **Issue:** No dedicated GitHub issue opened yet — targeting [#10856](https://github.com/internetarchive/openlibrary/issues/10856) (BookDash import, open/assigned) as the concrete scope. Background/prior art: [#8462](https://github.com/internetarchive/openlibrary/issues/8462), [#12091](https://github.com/internetarchive/openlibrary/issues/12091), [#8542](https://github.com/internetarchive/openlibrary/issues/8542)
+**Status:** Phase I → II — Recommendation posted on #10856, awaiting assignment/maintainer confirmation
 
 ---
 
 ## Note on Issue Status
 
-There is no single specific GitHub issue assigned to this contribution yet. A maintainer informed me directly (see screenshot below) to research the Trusted Book Providers (TBP) import process and come back with a concrete recommendation. My research is related to — but not a 1:1 match for — the existing issues above (#8462, #10856, #12091, #8542), which I'm using as background and prior art while I work.
+There is no dedicated GitHub issue opened for this contribution yet. A maintainer informed me directly (see screenshot below) to research the Trusted Book Providers (TBP) import process and come back with a concrete recommendation.
 
-Once my research and recommendation are complete, the maintainer and I will open a new, dedicated GitHub issue that reflects the actual scoped work, and I'll update this section with that link.
+After reading through the codebase (`docs/ai/imports/`), the four related issues, and comparing the two candidate data sources in flight (ITAN #12091 and BookDash #10856), I've landed on a concrete recommendation: **pick up the stalled BookDash import (#10856)** rather than starting a brand-new source from scratch. Reasoning:
+
+- ITAN's adapter code lives in a separate repo (`openlibrary-bots`) and is blocked on an identifier-registration PR merging first — higher setup cost, less in my control.
+- BookDash already has a working scraper (contributor's gist) and a real batch already submitted (`openlibrary.org/import/batch/1516`), stuck on one specific, well-defined bug: the scraper appended author roles to names (e.g. `"Megan Andrews (Illustrator)"`), risking duplicate author records on import. The issue is still open and assigned, but no fix has landed in months.
+- This is a smaller, closeable task that produces a real worked example for the "streamline & document" goal, rather than a second half-finished source.
+
+I posted this recommendation directly as a comment on [issue #10856](https://github.com/internetarchive/openlibrary/issues/10856) and asked the maintainer to assign it to me. Once assigned/confirmed, I'll update this section with the comment link and, if a dedicated issue is opened, that link as well.
 
 **Screenshot of maintainer conversation:**
 <img width="888" height="456" alt="Screenshot 2026-07-14 at 8 20 20 PM" src="https://github.com/user-attachments/assets/7bccadff-b37a-4c17-891a-7840a40752e9" />
@@ -43,7 +49,7 @@ A new trusted provider should be onboardable by following documented steps and a
 
 ### Current Behavior
 
-Each new source is a bespoke, mostly undocumented effort. Two related public issues show this breaking down in different ways: ITAN (#12091) is blocked on an identifier-registration PR that hasn't merged/deployed; BookDash (#10856) got further (working scraper, one real batch submitted) but hit undocumented gotchas — author-name/role duplication risk, silently dropped cover images, no way to delete a bad batch.
+Each new source is a bespoke, mostly undocumented effort. Two related public issues show this breaking down in different ways: ITAN (#12091) is blocked on an identifier-registration PR that hasn't merged/deployed; BookDash (#10856) got further (working scraper, one real batch submitted as `openlibrary.org/import/batch/1516`) but is stuck on an undocumented gotcha — the scraper appended author roles to names (e.g. `"Megan Andrews (Illustrator)"`), which risks creating duplicate author records instead of matching the existing canonical author. A maintainer said months ago they'd try to fix this on the OL side; nothing has landed, and the batch remains unresolved with no UI path to edit or delete it.
 
 ### Affected Components
 
@@ -78,27 +84,32 @@ Not applicable yet — this is a process/documentation gap, not a reproducible b
 
 ### Analysis
 
-[Not yet started — Phase II/III, pending a dedicated issue and maintainer scope confirmation]
+The root cause is a name-normalization gap: whatever validates/ingests batch JSONL records doesn't strip or flag parenthetical role suffixes on author names before they're matched against existing author records in `add_book.load()`. The fix could live in one of two places — the source-specific scraper (quick, but only fixes BookDash) or the shared import pipeline's author-matching step in `openlibrary/catalog/add_book/__init__.py` (slower, but prevents every future source from hitting the same bug). The maintainer's own comment on #10856 ("I think we'll try to update these for you") suggests they lean toward a pipeline-side fix, but this needs to be confirmed before scoping the PR.
 
 ### Proposed Solution
 
-[Not yet started — Phase II/III]
+1. Pull the exact author-string format from the contributor's scraper gist to confirm the pattern to strip (e.g. trailing `" (Role)"`).
+2. Confirm with the maintainer whether the fix belongs in the shared pipeline or the one-off script.
+3. Implement the normalization + a regression test.
+4. Dry-run corrected records via `/api/import?preview=true` (or the FastAPI `/import/preview.json`) before touching the real batch.
+5. Coordinate deleting/resubmitting batch 1516 (no in-UI edit/delete exists today).
+6. Document the "parenthetical author role" gotcha in `docs/ai/imports/adding-sources.md`, and separately flag that the doc links to a `pm/workflows/import_workflow.md` file that doesn't exist in the repo.
 
 ### Implementation Plan
 
 Using UMPIRE framework (adapted):
 
-**Understand:** [Not yet started — Phase II]
+**Understand:** Traced the full pipeline via `docs/ai/imports/` and `openlibrary/catalog/add_book/__init__.py` to find where author matching happens and where a name-normalization fix would need to live.
 
-**Match:** [Not yet started — Phase II]
+**Match:** Compared fixing the one-off scraper vs. a shared pipeline-side normalization step (the latter reuses the existing author-matching code path in `add_book.load()` rather than adding source-specific logic that only benefits BookDash).
 
-**Plan:** [Not yet started — Phase II]
+**Plan:** Documented as a 6-step plan above — confirm fix location with maintainer, implement + test, dry-run via preview endpoint, resubmit batch 1516, update docs, flag the broken doc link. See working plan notes for full detail.
 
-**Implement:** [Not yet started — Phase III]
+**Implement:** Not yet started — pending maintainer confirmation on pipeline-side vs. script-side fix.
 
-**Review:** [Not yet started — Phase III]
+**Review:** Not yet started — Phase III.
 
-**Evaluate:** [Not yet started — Phase III]
+**Evaluate:** Not yet started — Phase III.
 
 ---
 
@@ -120,15 +131,23 @@ Using UMPIRE framework (adapted):
 
 ## Implementation Notes
 
-### Week 1 Progress (2026-07-14)
+### Week 1 Progress (2026-07-07)
 
-Spent this week on research only, no code written. Read the four related GitHub issues (#8462, #10856, #12091, #8542) in full, including comment threads, per a maintainer's direct request to investigate the TBP import process. Compared the ITAN and BookDash cases as reference points for what a streamlined process needs to solve. Next step: bring a concrete recommendation back to the maintainer, at which point a dedicated GitHub issue will be opened for this contribution.
+Spent this week on research only, no code written. Read the four related GitHub issues (#8462, #10856, #12091, #8542) in full, including comment threads, per a maintainer's direct request to investigate the TBP import process. Compared the ITAN and BookDash cases as reference points for what a streamlined process needs to solve.
+
+### Week 2 Progress (2026-07-14)
+
+Reviewed `docs/ai/imports/` (recently merged internal documentation covering the pipeline architecture, API endpoints, and how to add a new source) against the four issues to see what's already solved vs. still a real gap. Decided on a concrete recommendation: pick up the stalled BookDash batch (#10856) rather than starting a new source, since it's the smallest closeable unit of work with a real, already-submitted batch blocked on one specific bug (author name/role duplication risk). Confirmed the issue is still open and assigned (no fix landed) and drafted a 6-step implementation plan (see Solution Approach above). Also found that `docs/ai/imports/adding-sources.md` links to a `pm/workflows/import_workflow.md` file that doesn't exist anywhere in the repo — a small doc gap worth flagging to the maintainer alongside the main recommendation.
+
+### Week 3 Progress (2026-07-19)
+
+Posted the recommendation and 6-step plan as a comment directly on [issue #10856](https://github.com/internetarchive/openlibrary/issues/10856), and asked the maintainer to assign the issue to me. Also sent a short direct follow-up message since I'd been slow to respond earlier in the week due to other work and coursework commitments. Awaiting maintainer response on: (1) whether to fix the author-name bug in the scraper script or the shared pipeline, (2) how to handle deleting/resubmitting the stuck batch, and (3) confirmation to proceed with BookDash as the scoped source.
 
 ### Code Changes
 
 - **Files modified:** None yet
 - **Key commits:** None yet
-- **Approach decisions:** None yet — pending maintainer scope confirmation
+- **Approach decisions:** Targeting BookDash (#10856) over ITAN (#12091) as the scoped source — see Solution Approach for reasoning. Pipeline-side vs. script-side fix location still pending maintainer confirmation.
 
 ---
 
@@ -140,8 +159,9 @@ Spent this week on research only, no code written. Read the four related GitHub 
 
 **Maintainer Feedback:**
 - 2026-07-14: Maintainer asked me directly (via chat) to research the TBP import process and come back with a recommendation, rather than assigning a specific existing issue.
+- 2026-07-19: Posted the recommendation on issue #10856 and requested assignment; awaiting maintainer response.
 
-**Status:** Awaiting research completion / dedicated issue
+**Status:** Awaiting maintainer response / assignment on #10856
 
 ---
 
